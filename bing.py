@@ -97,17 +97,17 @@ if __name__=='__main__':
             print("文件路径不存在或格式错误，请重新输入！")
     img_down,name_down=img_url_download()
     length=len(img_down)
-##    for i in range(0,length):
-##        print(name_down[i].split('(')[0][0:-1])
-##        #urllib.request.urlretrieve(i,'D:\wallpaper\%s.jpg' %i[37:].split("?")[0])
-##        if name_down[i].find('【')!=-1:
-##            if name_down[i].find('（')!=-1:
-##                urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('（')[0][0:-1].split('】')[1]))
-##            else:
-##                urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('(')[0][0:-1].split('】')[1]))
-##        elif name_down[i].find('（')!=-1:
-##            urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('（')[0][0:-1]))
-##        else:
-##            urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('(')[0][0:-1]))
-##        print("download picture %0.2f"%(100*(i+1)/(length)),"%",sep="")
+    for i in range(0,length):
+        print(name_down[i].split('(')[0][0:-1])
+        #urllib.request.urlretrieve(i,'D:\wallpaper\%s.jpg' %i[37:].split("?")[0])
+        if name_down[i].find('【')!=-1:
+            if name_down[i].find('（')!=-1:
+                urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('（')[0][0:-1].split('】')[1]))
+            else:
+                urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('(')[0][0:-1].split('】')[1]))
+        elif name_down[i].find('（')!=-1:
+            urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('（')[0][0:-1]))
+        else:
+            urllib.request.urlretrieve(img_down[i],'%s/%s.jpg'%(file_save,name_down[i].split('(')[0][0:-1]))
+        print("download picture %0.2f"%(100*(i+1)/(length)),"%",sep="")
     print("succeed save pictures in %s"%file_save)
