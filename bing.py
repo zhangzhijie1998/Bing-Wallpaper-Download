@@ -5,43 +5,6 @@ import urllib.request
 import re
 import os
 
-##def img_url_download():
-##    url="https://bing.ioliu.cn/"
-##    url_head='https://bing.ioliu.cn'
-##    pattern='a class="ctrl download" href="/photo/[A-z,-]{0,}[0-9]{0,}\?force=download'
-##    pattern_num='i class="icon icon-prev">上一页</i></a><span>1 / [0-9]{0,}'
-##
-##    req = urllib.request.Request(url)
-##    page = urllib.request.urlopen(req)
-##    html=page.read()
-##    
-##    match_num=re.findall(pattern_num,html.decode('utf-8'))
-##    sum_num=int(match_num[0].split("1")[1][3:])+1
-##    img_down=[]
-##    
-##    for i in range(1,sum_num):
-##        url="https://bing.ioliu.cn/?p="+str(i)
-##        req = urllib.request.Request(url)
-##        page = urllib.request.urlopen(req)
-##        html=page.read()
-##        match_list=re.findall(pattern,html.decode('utf-8'))
-##        
-##        for j in match_list:
-##            img_down.append(url_head+j[30:])
-####            print(img_down) #check
-##        print("save data %d"%(100*i/(sum_num-1)),"%",sep="")
-##        
-####    print(len(img_down)) #check
-##    return img_down
-##
-##if __name__=='__main__':
-##    img_down=img_url_download()
-##    length=len(img_down)
-##    for i in img_down:
-##        urllib.request.urlretrieve(i,'D:\wallpaper\%s.jpg' %i[37:].split("?")[0])
-##        print("download picture %0.2f"%(100*i/(length)),"%",sep="")
-##    print("succeed")
-
 def img_url_download():
     url="https://bing.ioliu.cn/"
     url_head='https://bing.ioliu.cn'
