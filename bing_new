@@ -1,0 +1,116 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+import urllib
+import urllib.request
+import re
+import os
+import time
+from multiprocessing import Pool
+
+img_down=[]
+name_down=[]
+file_save=""
+
+def judge_file():
+    while True: 
+        try:
+            global file_save
+            file_save=input("请输入保存文件路径，（例：D:/wallpaper）:")
+            if os.path.exists(file_save):
+                break
+            else:
+                os.makedirs('%s'%file_save)
+                break
+        except:
+            print("文件路径不存在或格式错误，请重新输入！")
+##    while True:
+##        try:
+##            download_image(file_save)
+##        except:
+##            pass
+    download_image(file_save)
+
+def img_url_download():
+    url="https://bing.ioliu.cn/"
+    url_head='https://bing.ioliu.cn'
+    pattern='a class="ctrl download" href="/photo/[A-z,0-9,-]{0,}[0-9]{0,}\?force=download'
+    #pattern_num='i class="icon icon-prev">上一页</i></a><span>1 / [0-9]{0,}'
+    #原网页对显示的总页数已做改动
+    pattern_num='<a href="/">上一页</a><span>1 / ([0-9]{0,})</span>'
+    pattern_name='<h3>(.*?)</h3>'        #'<h3>[^\x00-\xff]{0,}'
+
+    req = urllib.request.Request(url)
+    #print(req)
+    page = urllib.request.urlopen(req)
+    #time.sleep(1)
+    html=page.read()
+
+    #print(html.decode('utf-8'))
+    match_num=re.findall(pattern_num,html.decode('utf-8'))
+
+    print(match_num[0])
+    #sum_num=int(match_num[0].split(" ")[-1])
+    #此处所用正则做了改动
+    sum_num=int(match_num[0])
+    img_down=[]
+    name_down=[]
+    
+    for i in range(1,sum_num):
+        url="https://bing.ioliu.cn/?p="+str(i)
+        req = urllib.request.Request(url)
+        page = urllib.request.urlopen(req)
+        time.sleep(1)
+        html=page.read()
+        match_list=re.findall(pattern,html.decode('utf-8'))
+        match_name=re.findall(pattern_name,html.decode('utf-8'))
+        
+        for j in match_list:
+            img_down.append(url_head+j[30:])
+        for k in match_name:
+            name_down.append(k)
+        print("save address data %d"%(100*i/(sum_num-1)),"%",sep="")
+        
+        if(len(img_down)!=len(name_down)):
+            flag=input("程序在https://bing.ioliu.cn/?p=%d上匹配时出现了错误，是否继续？y/n\n"%i)
+            while True:
+                if flag=='y':
+                    break
+                elif flag=='n':
+                    exit()
+                else:
+                    print("输入错误，请重新输入！")
+    return img_down,name_down
+
+def download(inf):
+    file_save,url,name=inf[0],inf[1],inf[2]
+    #urllib.request.urlretrieve(i,'D:\wallpaper\%s.jpg' %i[37:].split("?")[0])
+    if name.find('【')!=-1:
+        if name.find('（')!=-1:
+            urllib.request.urlretrieve(url,'%s/%s.jpg'%(file_save,name.split('（')[0][0:-1].split('】')[1]))
+        else:
+            urllib.request.urlretrieve(url,'%s/%s.jpg'%(file_save,name.split('(')[0][0:-1].split('】')[1]))
+    elif name.find('（')!=-1:
+        urllib.request.urlretrieve(url,'%s/%s.jpg'%(file_save,name.split('（')[0][0:-1]))
+    else:
+        urllib.request.urlretrieve(url,'%s/%s.jpg'%(file_save,name.split('(')[0][0:-1]))
+        #print("download picture %0.2f"%(100*(i+1)/(length)),"%",sep="")
+    #print(name.split('(')[0][0:-1])
+
+def download_image(file_save):
+    img_down,name_down=img_url_download()
+    length=len(img_down)
+    inf=[]
+    for i in range(0,length):
+        inf.append((file_save,img_down[i],name_down[i]))
+        
+    pool = Pool()
+    pool.map(download, inf)
+    pool.close()
+    pool.join()
+        
+if __name__=='__main__':
+    start = time.clock()
+    judge_file()
+    time_cost = (time.clock() - start)
+    print("Time used:",time_cost)
+
