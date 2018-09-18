@@ -89,7 +89,6 @@ def get_inf():
             global match_list, match_name
             match_list+=re.findall(pattern,html.decode('utf-8'))
             match_name+=re.findall(pattern_name,html.decode('utf-8'))
-            break
         except:
             continue
             
