@@ -106,7 +106,7 @@ def main():
 
     time_cost = (time.clock() - start)
     print("Time used:",time_cost)
-
+                
 if __name__=='__main__':
     main()
     
