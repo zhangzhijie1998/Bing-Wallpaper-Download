@@ -1,0 +1,113 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+import urllib
+import urllib.request
+import re
+import os
+import time
+import threading
+
+match_list = []
+match_name = []
+file_save = ""
+
+class Producer(threading.Thread):    # 产生随机数，将其加入整数列表
+    def __init__(self, lock, img_down):
+        threading.Thread.__init__(self)        
+        self.lock = lock         
+        self.img_down = img_down
+        #self.get_inf()
+
+    def run(self):
+        url_head='https://bing.ioliu.cn'
+        while True:
+            global match_list, match_name
+            if match_list:
+                temp_url = match_list.pop()
+                temp_name = match_name.pop()
+                self.img_down.append(url_head+temp_url[30:]+"&&&"+temp_name)
+            elif len(match_list) == 0:
+                break
+
+class Consumer(threading.Thread):    
+    def __init__(self, lock, img_down):    
+        threading.Thread.__init__(self)        
+        self.lock = lock        
+        self.img_down = img_down
+    def run(self):
+        while True:
+            if self.img_down:
+                img_down_inf = self.img_down.pop()
+                down_url, name = img_down_inf.split("&&&")
+                print(name.split('(')[0][0:-1])
+                global file_save
+                if name.find('【')!=-1:
+                    if name.find('（')!=-1:
+                        urllib.request.urlretrieve(down_url,'%s/%s.jpg'%(file_save,name.split('（')[0][0:-1].split('】')[1]))
+                    else:
+                        urllib.request.urlretrieve(down_url,'%s/%s.jpg'%(file_save,name.split('(')[0][0:-1].split('】')[1]))
+                elif name.find('（')!=-1:
+                    urllib.request.urlretrieve(down_url,'%s/%s.jpg'%(file_save,name.split('（')[0][0:-1]))
+                else:
+                    urllib.request.urlretrieve(down_url,'%s/%s.jpg'%(file_save,name.split('(')[0][0:-1]))
+            elif len(match_list) == 0:
+                break
+def get_inf():
+    while True: 
+        try:
+            global file_save
+            file_save=input("请输入保存文件路径，（例：D:/wallpaper）:")
+            if os.path.exists(file_save):
+                break
+            else:
+                os.makedirs('%s'%file_save)
+                break
+        except:
+            print("文件路径不存在或格式错误，请重新输入！")
+    print("hhh")
+    url="https://bing.ioliu.cn/"
+    url_head='https://bing.ioliu.cn'
+    pattern='a class="ctrl download" href="/photo/[A-z,0-9,-]{0,}[0-9]{0,}\?force=download'
+    pattern_num='<a href="/">上一页</a><span>1 / ([0-9]{0,})</span>'
+    #pattern_num='i class="icon icon-prev">上一页</i></a><span>1 / [0-9]{0,}'
+    pattern_name='<h3>(.*?)</h3>'        #'<h3>[^\x00-\xff]{0,}'
+
+    req = urllib.request.Request(url)
+    page = urllib.request.urlopen(req)
+    html=page.read()
+    
+    match_num=re.findall(pattern_num,html.decode('utf-8'))
+    sum_num=int(match_num[0].split(" ")[-1])   
+
+    for i in range(1, sum_num+1):
+        try:
+            url="https://bing.ioliu.cn/?p="+str(i)
+            req = urllib.request.Request(url)
+            page = urllib.request.urlopen(req)
+            time.sleep(1)
+            html=page.read()
+            global match_list, match_name
+            match_list+=re.findall(pattern,html.decode('utf-8'))
+            match_name+=re.findall(pattern_name,html.decode('utf-8'))
+            break
+        except:
+            continue
+            
+    print("success")
+
+def main():    
+    get_inf()
+    start = time.clock()
+    img_down = []    
+    lock = threading.Lock()    
+    th1 = Producer(lock, img_down)
+    th2 = Consumer(lock, img_down)    
+    th1.start()    
+    th2.start()
+
+    time_cost = (time.clock() - start)
+    print("Time used:",time_cost)
+
+if __name__=='__main__':
+    main()
+
